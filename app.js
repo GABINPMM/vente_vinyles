@@ -1,5 +1,5 @@
 /* ==========================================================================
-   LE SILLON D'ORLÉANS — Script Simplifié Sans Parenthèses
+   BARWETA RECORDS — Script Simplifié Sans Parenthèses
    ========================================================================== */
 
 const VINYL_CATALOG = [
@@ -165,7 +165,7 @@ const VINYL_CATALOG = [
 let activeGenre = "all";
 let searchQuery = "";
 let sortBy = "recent";
-let crateIds = JSON.parse(localStorage.getItem("orleans_vinyl_selection") || "[]");
+let crateIds = JSON.parse(localStorage.getItem("barweta_records_selection") || "[]");
 let buyPhotosFiles = [];
 let sellPhotosFiles = [];
 
@@ -339,7 +339,7 @@ window.toggleCrate = function(recordId) {
     } else {
         crateIds.push(recordId);
     }
-    localStorage.setItem("orleans_vinyl_selection", JSON.stringify(crateIds));
+    localStorage.setItem("barweta_records_selection", JSON.stringify(crateIds));
     updateCrateUI();
     renderCatalog();
 };
