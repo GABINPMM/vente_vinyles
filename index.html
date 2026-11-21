@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le Sillon d'Orléans — Vinyles entre Particuliers</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- En-tête simple & direct -->
+    <header class="masthead">
+        <div class="container">
+            <div class="masthead-top">
+                <div class="brand">
+                    <span class="badge-local">ORLÉANS • PARTICULIER</span>
+                    <h1 class="site-title">LE SILLON D'ORLÉANS</h1>
+                    <p class="sous-titre">Vente et rachat de vinyles en bon état • Remise en main propre</p>
+                </div>
+
+                <!-- Les 2 actions principales -->
+                <div class="header-actions">
+                    <button class="btn-header-buy" onclick="openActionTab('buy')">
+                        <span>Ma sélection : <strong id="selection-count">0</strong></span>
+                    </button>
+                    <button class="btn-header-sell" onclick="openActionTab('sell')">
+                        <span>Vendre mes vinyles</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Recherche & Filtres par style -->
+    <section class="search-console" id="catalogue">
+        <div class="container">
+            <div class="console-frame">
+                <!-- Barre de recherche + Tri -->
+                <div class="search-bar-row">
+                    <div class="search-input-wrap">
+                        <input 
+                            type="text" 
+                            id="search-input" 
+                            placeholder="Rechercher un artiste ou un album..."
+                            autocomplete="off"
+                        >
+                        <button id="btn-clear-search" class="clear-btn" title="Effacer" hidden>×</button>
+                    </div>
+
+                    <div class="sort-wrap">
+                        <label for="sort-select">TRIER :</label>
+                        <select id="sort-select">
+                            <option value="recent">Nouveautés</option>
+                            <option value="price-asc">Prix croissant</option>
+                            <option value="price-desc">Prix décroissant</option>
+                            <option value="artist-asc">Ordre A - Z</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Styles de musique -->
+                <div class="crate-tabs" id="genre-tabs">
+                    <button class="crate-tab active" data-genre="all">Tous les styles</button>
+                    <button class="crate-tab" data-genre="Rock & Psyché">Rock</button>
+                    <button class="crate-tab" data-genre="Jazz & Blues">Jazz & Blues</button>
+                    <button class="crate-tab" data-genre="Soul & Funk">Soul & Funk</button>
+                    <button class="crate-tab" data-genre="Chanson & Variété FR">Chanson FR</button>
+                    <button class="crate-tab" data-genre="Hip-Hop & Electro">Hip-Hop & Electro</button>
+                    <button class="crate-tab" data-genre="Reggae & World">Reggae & World</button>
+                    <button class="crate-tab" data-genre="Hard & Metal">Hard & Metal</button>
+                </div>
+
+                <!-- Lien direct si la personne ne trouve pas -->
+                <div class="console-footer">
+                    <span>Catalogue vitrine sans paiement en ligne.</span>
+                    <button type="button" class="link-ask-stock" onclick="openActionTab('buy')">
+                        Un disque absent ? Demandez s'il est en stock →
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Grille des Vinyles -->
+    <main class="catalog-section">
+        <div class="container">
+            <div id="records-container" class="records-grid">
+                <!-- Rempli par app.js -->
+            </div>
+
+            <!-- Si aucun résultat -->
+            <div id="empty-state" class="empty-state" hidden>
+                <h3>Ce vinyle n'est pas sur le site</h3>
+                <p>J'ai d'autres disques en stock à Orléans. Demandez-moi directement !</p>
+                <div class="empty-state-actions">
+                    <button id="btn-ask-stock-from-empty" class="btn-primary">Demander ce vinyle →</button>
+                    <button id="btn-empty-reset" class="btn-secondary">Tout afficher</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Formulaire Unique -->
+    <section class="forms-section" id="formulaires-contact">
+        <div class="container">
+            <div class="forms-wrapper">
+                <div class="forms-header">
+                    <h2>Me Contacter</h2>
+                    <p>Choisissez votre demande dans le menu ci-dessous :</p>
+                </div>
+
+                <!-- Menu déroulant Acheter vs Vendre -->
+                <div class="form-mode-selector">
+                    <label for="contact-mode-select" class="mode-select-label">JE SOUHAITE :</label>
+                    <select id="contact-mode-select">
+                        <option value="buy">Acheter ou chercher un vinyle</option>
+                        <option value="sell">Vendre mes vinyles</option>
+                    </select>
+                </div>
+
+                <!-- OPTION 1 : ACHETER / DEMANDER EN STOCK -->
+                <form id="form-buy" class="vintage-form">
+                    <div class="form-grid-2">
+                        <div class="form-col">
+                            <div class="form-field">
+                                <label>Ma sélection sur le site :</label>
+                                <div id="buy-form-selected-list" class="form-selected-box"></div>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="buy-custom-request">Vous cherchez un autre vinyle ? Écrivez-moi :</label>
+                                <textarea 
+                                    id="buy-custom-request" 
+                                    rows="3" 
+                                    placeholder="Indiquez les artistes ou albums recherchés..."
+                                ></textarea>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="buy-photos">Ajouter une image :</label>
+                                <div class="photo-upload-zone">
+                                    <input type="file" id="buy-photos" accept="image/*" multiple>
+                                    <span>Cliquer ici pour joindre une photo</span>
+                                </div>
+                                <div id="buy-photos-preview" class="photos-preview-grid"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-col">
+                            <div class="form-field">
+                                <label for="buy-name">Votre Prénom *</label>
+                                <input type="text" id="buy-name" required placeholder="Votre prénom">
+                            </div>
+
+                            <div class="form-field">
+                                <label for="buy-contact">Votre Téléphone ou Email *</label>
+                                <input type="text" id="buy-contact" required placeholder="Numéro ou adresse email">
+                            </div>
+
+                            <button type="submit" class="btn-primary btn-full" style="margin-top: 8px;">
+                                Envoyer mon message →
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- OPTION 2 : VENDRE SES VINYLES -->
+                <form id="form-sell" class="vintage-form" hidden>
+                    <div class="form-grid-2">
+                        <div class="form-col">
+                            <div class="form-field">
+                                <label for="sell-description">Quels vinyles vendez-vous ? *</label>
+                                <textarea 
+                                    id="sell-description" 
+                                    rows="4" 
+                                    required
+                                    placeholder="Indiquez le nombre de disques et les styles..."
+                                ></textarea>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="sell-photos">Photos de vos vinyles :</label>
+                                <div class="photo-upload-zone">
+                                    <input type="file" id="sell-photos" accept="image/*" multiple>
+                                    <span>Cliquer ici pour ajouter des photos</span>
+                                </div>
+                                <div id="sell-photos-preview" class="photos-preview-grid"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-col">
+                            <div class="form-field">
+                                <label for="sell-name">Votre Prénom *</label>
+                                <input type="text" id="sell-name" required placeholder="Votre prénom">
+                            </div>
+
+                            <div class="form-field">
+                                <label for="sell-contact">Votre Téléphone ou Email *</label>
+                                <input type="text" id="sell-contact" required placeholder="Numéro ou adresse email">
+                            </div>
+
+                            <button type="submit" class="btn-primary btn-full" style="margin-top: 8px;">
+                                Envoyer ma proposition →
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <div id="form-confirmation-box" class="form-confirmation-box" hidden></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Petits textes d'explication en fin de page -->
+    <section class="info-end-section">
+        <div class="container">
+            <div class="info-end-grid">
+                <div class="info-end-box">
+                    <h3>Une simple vitrine</h3>
+                    <p>Je suis un particulier passionné à Orléans. Ce site présente mes vinyles disponibles, tous en bon état.</p>
+                </div>
+                <div class="info-end-box">
+                    <h3>Aucun achat en ligne</h3>
+                    <p>Rien ne s'achète ni ne se paie sur le site. Vous repérez vos disques, vous me contactez et on se retrouve sur Orléans.</p>
+                </div>
+                <div class="info-end-box">
+                    <h3>Stock et rachat</h3>
+                    <p>Si vous cherchez un disque absent du site ou si vous souhaitez me vendre vos vinyles, écrivez-moi via le formulaire.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Fenêtre Détails d'un Vinyle -->
+    <div id="record-modal" class="modal-backdrop" hidden>
+        <div class="modal-card" role="dialog" aria-modal="true">
+            <button id="btn-close-modal" class="modal-close">× FERMER</button>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- Pied de page court -->
+    <footer class="site-footer">
+        <div class="container footer-simple">
+            <span><strong>LE SILLON D'ORLÉANS</strong> — Vente et rachat de vinyles entre particuliers à Orléans</span>
+            <span>Tél : 06 00 00 00 00 • Email : contact@mon-email.fr</span>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
