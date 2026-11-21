@@ -547,6 +547,9 @@ body {
 }
 
 .form-field input[type="text"],
+.form-field input[type="number"],
+.form-field input[type="password"],
+.form-field select,
 .form-field textarea {
     width: 100%;
     padding: 10px 12px;
@@ -780,79 +783,470 @@ body {
 .footer-simple {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     flex-wrap: wrap;
     gap: 10px;
 }
 
+.footer-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.btn-admin-access {
+    background-color: #2f2b26;
+    color: #d8cfc0;
+    border: 1px solid #6b6356;
+    padding: 5px 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.btn-admin-access:hover {
+    background-color: var(--accent-red);
+    color: #fff;
+    border-color: #fff;
+}
+
 /* ==========================================================================
-   ADAPTATION TÉLÉPHONE (MOBILE)
+   ESPACE VENDEUR (ONCLE) — AJOUT & SUPPRESSION DE VINYLES
+   ========================================================================== */
+.admin-panel {
+    background-color: #e8dfc9;
+    border-bottom: 3px solid var(--accent-red);
+    padding: 22px 0;
+}
+
+.admin-panel[hidden] {
+    display: none;
+}
+
+.admin-box {
+    background-color: var(--bg-card);
+    border: var(--border-heavy);
+    box-shadow: 5px 5px 0 var(--ink-black);
+    padding: 22px;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    border-bottom: var(--border-heavy);
+    padding-bottom: 14px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+}
+
+.badge-admin {
+    display: inline-block;
+    background-color: var(--accent-green);
+    color: #fff;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    margin-bottom: 6px;
+}
+
+.admin-header h2 {
+    font-family: var(--font-display);
+    font-size: 24px;
+}
+
+.admin-header p {
+    font-size: 13.5px;
+    color: var(--ink-muted);
+    margin-top: 4px;
+}
+
+.admin-grid {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+.admin-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.admin-photo-drop {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    border: 2px dashed var(--ink-black);
+    background-color: var(--bg-paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 14px;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.admin-photo-drop input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+}
+
+.admin-photo-placeholder {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.admin-photo-placeholder span {
+    font-size: 11px;
+    color: var(--ink-muted);
+}
+
+.admin-photo-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+}
+
+.admin-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.admin-row-3 {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr;
+    gap: 14px;
+}
+
+/* Image réelle sur une pochette de vinyle du catalogue */
+.album-jacket-photo {
+    width: 154px;
+    height: 154px;
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.45);
+    position: relative;
+    z-index: 2;
+    object-fit: cover;
+    background-color: #1c1a17;
+    transition: transform 0.2s ease;
+}
+
+.sleeve-visual:hover .album-jacket-photo {
+    transform: translateX(-10px);
+}
+
+/* Bouton Supprimer un disque (visible uniquement en Mode Vendeur) */
+.btn-delete-record {
+    margin-top: 8px;
+    width: 100%;
+    background-color: #fff0f0;
+    color: var(--accent-red);
+    border: 1px solid var(--accent-red);
+    padding: 7px 10px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+.btn-delete-record:hover {
+    background-color: var(--accent-red);
+    color: #fff;
+}
+
+/* ==========================================================================
+   ADAPTATION TÉLÉPHONE (MOBILE — GRILLE 3 VINYLES PAR LIGNE)
    ========================================================================== */
 @media (max-width: 768px) {
     .container {
-        padding: 0 12px;
+        padding: 0 8px;
+    }
+
+    /* En-tête compact sur mobile */
+    .masthead {
+        padding: 12px 0;
     }
 
     .masthead-top {
         flex-direction: column;
         align-items: stretch;
         text-align: center;
+        gap: 10px;
+    }
+
+    .badge-local {
+        font-size: 9.5px;
+        padding: 2px 6px;
+        margin-bottom: 3px;
     }
 
     .site-title {
-        font-size: 28px;
+        font-size: 24px;
+    }
+
+    .sous-titre {
+        font-size: 12px;
+        margin-top: 2px;
     }
 
     .header-actions {
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
     }
 
     .btn-header-buy,
     .btn-header-sell {
         width: 100%;
         text-align: center;
+        font-size: 11px;
+        padding: 9px 6px;
+        box-shadow: 2px 2px 0 var(--ink-black);
+    }
+
+    /* Console de recherche compacte */
+    .search-console {
+        padding: 12px 0 10px;
+    }
+
+    .console-frame {
+        padding: 10px;
+        box-shadow: 3px 3px 0 var(--ink-black);
     }
 
     .search-bar-row {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 135px;
+        gap: 6px;
+        margin-bottom: 10px;
     }
 
-    #search-input,
-    .form-field input[type="text"],
-    .form-field textarea,
-    #contact-mode-select {
-        font-size: 16px; /* Évite le zoom automatique sur téléphone */
+    #search-input {
+        font-size: 16px;
+        padding: 8px 24px 8px 8px;
     }
 
-    /* Styles musicaux défilables au doigt sur téléphone */
+    .sort-wrap {
+        padding: 0 6px;
+    }
+
+    .sort-wrap label {
+        display: none;
+    }
+
+    .sort-wrap select {
+        font-size: 11px;
+        padding: 8px 0;
+    }
+
+    /* Styles musicaux défilables au doigt */
     .crate-tabs {
         flex-wrap: nowrap;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
+        gap: 6px;
         padding-bottom: 8px;
     }
 
     .crate-tab {
         white-space: nowrap;
         flex-shrink: 0;
+        font-size: 11px;
+        padding: 5px 9px;
+    }
+
+    .console-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        padding-top: 8px;
+        font-size: 11.5px;
+    }
+
+    .link-ask-stock {
+        font-size: 11.5px;
+        text-align: left;
+    }
+
+    /* GRILLE 3 PAR 3 SUR TÉLÉPHONE */
+    .catalog-section {
+        padding: 6px 0 24px;
     }
 
     .records-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 7px;
+    }
+
+    .record-card {
+        box-shadow: 2px 2px 0 var(--ink-black);
+        border-width: 1.5px;
+    }
+
+    .price-sticker {
+        top: 4px;
+        right: 4px;
+        padding: 1px 4px;
+        font-size: 10.5px;
+        border-width: 1px;
+        box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+    }
+
+    /* Visuel pochette adapté aux 3 colonnes */
+    .sleeve-visual {
+        height: 96px;
+        padding: 6px;
+        border-bottom-width: 1.5px;
+    }
+
+    .album-jacket,
+    .album-jacket-photo {
+        width: 78px;
+        height: 78px;
+        padding: 4px;
+        border-width: 1px;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.45);
+    }
+
+    .vinyl-disc {
+        display: none; /* Évite de surcharger la petite vignette 3x3 sur mobile */
+    }
+
+    .jacket-top-meta,
+    .jacket-cat {
+        font-size: 7px;
+    }
+
+    .jacket-artist {
+        font-size: 9px;
+        line-height: 1.05;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    .jacket-title {
+        font-size: 7.5px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    /* Texte sous la pochette compact */
+    .record-body {
+        padding: 6px;
+    }
+
+    .record-meta-top {
+        font-size: 8.5px;
+        margin-bottom: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+    }
+
+    .record-meta-top span:last-child {
+        display: none; /* Garde uniquement le style en haut pour rester lisible */
+    }
+
+    .record-artist {
+        font-size: 11.5px;
+        line-height: 1.15;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .record-title {
+        font-size: 10px;
+        margin-bottom: 6px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .record-actions {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .btn-details,
+    .btn-reserve {
+        width: 100%;
+        font-size: 9.5px;
+        padding: 5px 3px;
+        text-align: center;
+    }
+
+    .btn-delete-record {
+        margin-top: 4px;
+        font-size: 8.5px;
+        padding: 4px 2px;
+    }
+
+    /* Formulaires & Fin de page */
+    .forms-wrapper {
+        padding: 14px 10px;
+    }
+
+    .forms-header h2 {
+        font-size: 20px;
     }
 
     .form-mode-selector {
         flex-direction: column;
         align-items: flex-start;
         gap: 6px;
+        padding: 10px;
+    }
+
+    .form-field input[type="text"],
+    .form-field input[type="number"],
+    .form-field input[type="password"],
+    .form-field select,
+    .form-field textarea,
+    #contact-mode-select {
+        font-size: 16px; /* Évite le zoom automatique sur téléphone */
+        padding: 8px 10px;
     }
 
     .form-grid-2,
-    .info-end-grid {
+    .info-end-grid,
+    .admin-grid,
+    .admin-row-2,
+    .admin-row-3 {
         grid-template-columns: 1fr;
-        gap: 14px;
+        gap: 12px;
     }
 
-    .footer-simple {
+    .info-end-box {
+        padding: 12px;
+    }
+
+    .footer-simple,
+    .footer-right {
         flex-direction: column;
         text-align: center;
     }

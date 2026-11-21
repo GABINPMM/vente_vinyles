@@ -1,8 +1,8 @@
 /* ==========================================================================
-   BARWETA RECORDS — Script Simplifié Sans Parenthèses
+   BARWETA RECORDS — Catalogue, Recherche & Espace Vendeur (Oncle)
    ========================================================================== */
 
-const VINYL_CATALOG = [
+const DEFAULT_CATALOG = [
     {
         id: "VIN-01",
         artist: "Pink Floyd",
@@ -161,13 +161,35 @@ const VINYL_CATALOG = [
     }
 ];
 
-// État
+// Mot de passe Vendeur pour l'oncle (modifiable ici très facilement)
+const VENDOR_PASSWORD = "barweta";
+
+// Chargement du catalogue (avec les ajouts/suppressions de l'oncle sauvegardés)
+let vinylCatalog = [];
+try {
+    const saved = localStorage.getItem("barweta_records_catalog_v1");
+    vinylCatalog = saved ? JSON.parse(saved) : [...DEFAULT_CATALOG];
+} catch (e) {
+    vinylCatalog = [...DEFAULT_CATALOG];
+}
+
+function saveCatalog() {
+    try {
+        localStorage.setItem("barweta_records_catalog_v1", JSON.stringify(vinylCatalog));
+    } catch (e) {
+        alert("Attention : la mémoire locale est pleine, pensez à utiliser une image plus légère.");
+    }
+}
+
+// État général
 let activeGenre = "all";
 let searchQuery = "";
 let sortBy = "recent";
+let isVendorLoggedIn = sessionStorage.getItem("barweta_vendor_logged") === "true";
 let crateIds = JSON.parse(localStorage.getItem("barweta_records_selection") || "[]");
 let buyPhotosFiles = [];
 let sellPhotosFiles = [];
+let adminUploadedPhotoDataUrl = "";
 
 // Éléments DOM
 const recordsContainer = document.getElementById("records-container");
@@ -190,11 +212,197 @@ const formSell = document.getElementById("form-sell");
 const buyCustomRequest = document.getElementById("buy-custom-request");
 const formConfirmationBox = document.getElementById("form-confirmation-box");
 
+// Éléments DOM Espace Vendeur
+const adminPanel = document.getElementById("admin-panel");
+const btnOpenLogin = document.getElementById("btn-open-login");
+const loginModal = document.getElementById("login-modal");
+const btnCloseLogin = document.getElementById("btn-close-login");
+const formLogin = document.getElementById("form-login");
+const loginPasswordInput = document.getElementById("login-password");
+const loginError = document.getElementById("login-error");
+const btnAdminLogout = document.getElementById("btn-admin-logout");
+
+const formAdminAdd = document.getElementById("form-admin-add");
+const adminPhotoInput = document.getElementById("admin-photo-input");
+const adminPhotoPreview = document.getElementById("admin-photo-preview");
+const adminPhotoPlaceholder = document.getElementById("admin-photo-placeholder");
+const btnRemoveAdminPhoto = document.getElementById("btn-remove-admin-photo");
+const adminMsg = document.getElementById("admin-msg");
+
 function formatEUR(val) {
-    return val.toFixed(0) + " €";
+    return Number(val).toFixed(0) + " €";
 }
 
-// Changement de formulaire via le menu déroulant
+// ==========================================================================
+// ESPACE VENDEUR (CONNEXION, COMPRESSION PHOTO, AJOUT & SUPPRESSION)
+// ==========================================================================
+function updateVendorUI() {
+    adminPanel.hidden = !isVendorLoggedIn;
+    btnOpenLogin.textContent = isVendorLoggedIn ? "Mode Vendeur Actif" : "Accès Vendeur";
+    renderCatalog();
+}
+
+btnOpenLogin.addEventListener("click", () => {
+    if (isVendorLoggedIn) {
+        adminPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+    }
+    loginPasswordInput.value = "";
+    loginError.hidden = true;
+    loginModal.hidden = false;
+    setTimeout(() => loginPasswordInput.focus(), 100);
+});
+
+btnCloseLogin.addEventListener("click", () => (loginModal.hidden = true));
+loginModal.addEventListener("click", e => {
+    if (e.target === loginModal) loginModal.hidden = true;
+});
+
+formLogin.addEventListener("submit", e => {
+    e.preventDefault();
+    const typed = loginPasswordInput.value.trim().toLowerCase();
+    if (typed === VENDOR_PASSWORD) {
+        isVendorLoggedIn = true;
+        sessionStorage.setItem("barweta_vendor_logged", "true");
+        loginModal.hidden = true;
+        updateVendorUI();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+        loginError.hidden = false;
+    }
+});
+
+btnAdminLogout.addEventListener("click", () => {
+    isVendorLoggedIn = false;
+    sessionStorage.removeItem("barweta_vendor_logged");
+    updateVendorUI();
+});
+
+// Compression automatique de la photo prise par l'oncle (pour que ce soit léger et rapide)
+function compressImageFile(file, callback) {
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        const img = new Image();
+        img.onload = function() {
+            const canvas = document.createElement("canvas");
+            const MAX_SIZE = 500;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+                if (width > MAX_SIZE) {
+                    height *= MAX_SIZE / width;
+                    width = MAX_SIZE;
+                }
+            } else {
+                if (height > MAX_SIZE) {
+                    width *= MAX_SIZE / height;
+                    height = MAX_SIZE;
+                }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, width, height);
+            const dataUrl = canvas.toDataURL("image/jpeg", 0.82);
+            callback(dataUrl);
+        };
+        img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+adminPhotoInput.addEventListener("change", e => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    compressImageFile(file, dataUrl => {
+        adminUploadedPhotoDataUrl = dataUrl;
+        adminPhotoPreview.src = dataUrl;
+        adminPhotoPreview.hidden = false;
+        adminPhotoPlaceholder.hidden = true;
+        btnRemoveAdminPhoto.hidden = false;
+    });
+});
+
+btnRemoveAdminPhoto.addEventListener("click", () => {
+    adminUploadedPhotoDataUrl = "";
+    adminPhotoInput.value = "";
+    adminPhotoPreview.src = "";
+    adminPhotoPreview.hidden = true;
+    adminPhotoPlaceholder.hidden = false;
+    btnRemoveAdminPhoto.hidden = true;
+});
+
+// Ajout d'un nouveau vinyle par l'oncle
+formAdminAdd.addEventListener("submit", e => {
+    e.preventDefault();
+    const artist = document.getElementById("admin-artist").value.trim();
+    const title = document.getElementById("admin-title").value.trim();
+    const genre = document.getElementById("admin-genre").value;
+    const format = document.getElementById("admin-format").value;
+    const price = Number(document.getElementById("admin-price").value);
+    const yearInput = document.getElementById("admin-year").value.trim();
+    const tracksInput = document.getElementById("admin-tracks").value.trim();
+
+    if (!adminUploadedPhotoDataUrl) {
+        alert("Cliquez sur le cadre à gauche pour choisir ou prendre la photo de la pochette du vinyle.");
+        return;
+    }
+
+    const tracksList = tracksInput
+        ? tracksInput.split(",").map(t => t.trim()).filter(Boolean)
+        : ["Morceaux à découvrir sur le disque"];
+
+    const newRecord = {
+        id: "VIN-" + Date.now(),
+        artist,
+        title,
+        genre,
+        year: yearInput ? Number(yearInput) : "Époque",
+        format,
+        isNewArrival: true,
+        price,
+        photoUrl: adminUploadedPhotoDataUrl,
+        jacketColor: "linear-gradient(135deg, #2b2623 0%, #4a413b 100%)",
+        labelColor: "#c93b2b",
+        tracks: tracksList
+    };
+
+    // Place le nouveau vinyle tout en haut du catalogue
+    vinylCatalog.unshift(newRecord);
+    saveCatalog();
+
+    // Réinitialiser le formulaire
+    formAdminAdd.reset();
+    btnRemoveAdminPhoto.click();
+
+    adminMsg.innerHTML = `<strong>Le vinyle « ${artist} — ${title} » a bien été ajouté sur le site !</strong> Il apparaît maintenant en premier dans le catalogue ci-dessous.`;
+    adminMsg.hidden = false;
+
+    activeGenre = "all";
+    genreTabs.forEach(t => t.classList.toggle("active", t.dataset.genre === "all"));
+    renderCatalog();
+});
+
+// Suppression d'un vinyle vendu par l'oncle
+window.deleteRecordFromCatalog = function(recordId) {
+    const rec = vinylCatalog.find(r => r.id === recordId);
+    if (!rec) return;
+    const ok = confirm(`Voulez-vous retirer le vinyle « ${rec.artist} - ${rec.title} » du site ?`);
+    if (!ok) return;
+
+    vinylCatalog = vinylCatalog.filter(r => r.id !== recordId);
+    crateIds = crateIds.filter(id => id !== recordId);
+    saveCatalog();
+    localStorage.setItem("barweta_records_selection", JSON.stringify(crateIds));
+    updateCrateUI();
+    renderCatalog();
+};
+
+// ==========================================================================
+// FORMULAIRE VISITEUR (ACHETER / VENDRE)
+// ==========================================================================
 window.switchFormTab = function(mode) {
     formConfirmationBox.hidden = true;
     if (contactModeSelect) {
@@ -215,7 +423,6 @@ if (contactModeSelect) {
     });
 }
 
-// Aller au formulaire
 window.openActionTab = function(mode, prefillQuery = "") {
     switchFormTab(mode);
     const formsSection = document.getElementById("formulaires-contact");
@@ -228,11 +435,13 @@ window.openActionTab = function(mode, prefillQuery = "") {
     }
 };
 
-// Filtrer et trier les disques
+// ==========================================================================
+// RECHERCHE, TRI & AFFICHAGE DU CATALOGUE
+// ==========================================================================
 function getFilteredRecords() {
     const q = searchQuery.trim().toLowerCase();
 
-    let list = VINYL_CATALOG.filter(item => {
+    let list = vinylCatalog.filter(item => {
         if (activeGenre !== "all" && item.genre !== activeGenre) return false;
         if (q) {
             const haystack = `${item.artist} ${item.title} ${item.year} ${item.genre}`.toLowerCase();
@@ -245,13 +454,12 @@ function getFilteredRecords() {
         if (sortBy === "price-asc") return a.price - b.price;
         if (sortBy === "price-desc") return b.price - a.price;
         if (sortBy === "artist-asc") return a.artist.localeCompare(b.artist, "fr");
-        return (b.isNewArrival ? 1 : 0) - (a.isNewArrival ? 1 : 0);
+        return 0; // Par défaut : garde l'ordre d'ajout (les derniers ajoutés en premier)
     });
 
     return list;
 }
 
-// Afficher la grille épurée
 function renderCatalog() {
     const records = getFilteredRecords();
 
@@ -265,21 +473,27 @@ function renderCatalog() {
 
     recordsContainer.innerHTML = records.map(rec => {
         const inCrate = crateIds.includes(rec.id);
+
+        // Si l'oncle a mis une vraie photo, on affiche sa photo sur la pochette !
+        const jacketHTML = rec.photoUrl
+            ? `<img src="${rec.photoUrl}" alt="${rec.artist} - ${rec.title}" class="album-jacket-photo">`
+            : `<div class="album-jacket" style="background: ${rec.jacketColor};">
+                    <div class="jacket-top-meta">${rec.year}</div>
+                    <div>
+                        <div class="jacket-artist">${rec.artist}</div>
+                        <div class="jacket-title">${rec.title}</div>
+                    </div>
+                    <div class="jacket-cat">${rec.format}</div>
+               </div>`;
+
         return `
             <article class="record-card">
                 <div class="price-sticker">${formatEUR(rec.price)}</div>
 
                 <div class="sleeve-visual" onclick="openRecordModal('${rec.id}')" title="Voir les morceaux">
-                    <div class="album-jacket" style="background: ${rec.jacketColor};">
-                        <div class="jacket-top-meta">${rec.year}</div>
-                        <div>
-                            <div class="jacket-artist">${rec.artist}</div>
-                            <div class="jacket-title">${rec.title}</div>
-                        </div>
-                        <div class="jacket-cat">${rec.format}</div>
-                    </div>
+                    ${jacketHTML}
                     <div class="vinyl-disc">
-                        <div class="vinyl-center-label" style="background-color: ${rec.labelColor};">
+                        <div class="vinyl-center-label" style="background-color: ${rec.labelColor || "#c93b2b"};">
                             <div class="vinyl-hole"></div>
                         </div>
                     </div>
@@ -299,6 +513,11 @@ function renderCatalog() {
                             ${inCrate ? "Sélectionné" : "+ Choisir"}
                         </button>
                     </div>
+                    ${isVendorLoggedIn ? `
+                        <button type="button" class="btn-delete-record" onclick="deleteRecordFromCatalog('${rec.id}')">
+                            Supprimer ce vinyle du site
+                        </button>
+                    ` : ""}
                 </div>
             </article>
         `;
@@ -307,11 +526,12 @@ function renderCatalog() {
 
 // Fenêtre simple pour voir les titres d'un disque
 window.openRecordModal = function(recordId) {
-    const rec = VINYL_CATALOG.find(r => r.id === recordId);
+    const rec = vinylCatalog.find(r => r.id === recordId);
     if (!rec) return;
     const inCrate = crateIds.includes(rec.id);
 
     modalBody.innerHTML = `
+        ${rec.photoUrl ? `<img src="${rec.photoUrl}" alt="${rec.title}" style="width:160px; height:160px; object-fit:cover; border:2px solid #1c1a17; margin-bottom:10px;">` : ""}
         <h2 style="font-family:var(--font-display); font-size:24px;">${rec.artist}</h2>
         <p style="font-style:italic; font-size:17px; color:var(--ink-muted); margin-bottom:10px;">
             ${rec.title} • ${rec.format} • ${rec.year} — <strong style="color:var(--accent-red);">${formatEUR(rec.price)}</strong>
@@ -355,7 +575,7 @@ function updateCrateUI() {
 
     let subtotal = 0;
     const rows = crateIds.map(id => {
-        const rec = VINYL_CATALOG.find(r => r.id === id);
+        const rec = vinylCatalog.find(r => r.id === id);
         if (!rec) return "";
         subtotal += rec.price;
         return `
@@ -375,7 +595,7 @@ function updateCrateUI() {
     `;
 }
 
-// Gestion de l'aperçu des photos
+// Gestion de l'aperçu des photos des formulaires visiteurs
 function setupPhotoUpload(inputId, previewId, filesArrayRef) {
     const input = document.getElementById(inputId);
     const preview = document.getElementById(previewId);
@@ -409,7 +629,7 @@ function setupPhotoUpload(inputId, previewId, filesArrayRef) {
 setupPhotoUpload("buy-photos", "buy-photos-preview", buyPhotosFiles);
 setupPhotoUpload("sell-photos", "sell-photos-preview", sellPhotosFiles);
 
-// Envoi des formulaires
+// Envoi des formulaires visiteurs
 formBuy.addEventListener("submit", e => {
     e.preventDefault();
     const name = document.getElementById("buy-name").value.trim();
@@ -487,4 +707,4 @@ recordModal.addEventListener("click", e => {
 
 // Initialisation
 updateCrateUI();
-renderCatalog();
+updateVendorUI();

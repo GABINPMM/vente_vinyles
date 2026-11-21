@@ -11,6 +11,99 @@
 </head>
 <body>
 
+    <!-- Bandeau Espace Vendeur (s'affiche uniquement quand l'oncle est connecté) -->
+    <section id="admin-panel" class="admin-panel" hidden>
+        <div class="container">
+            <div class="admin-box">
+                <div class="admin-header">
+                    <div>
+                        <span class="badge-admin">MODE VENDEUR ACTIVÉ</span>
+                        <h2>Ajouter un nouveau vinyle sur le site</h2>
+                        <p>Remplissez les cases ci-dessous puis cliquez sur le bouton rouge pour mettre le disque en ligne. Pour retirer un disque vendu, cliquez sur « Supprimer » sous sa pochette.</p>
+                    </div>
+                    <button type="button" id="btn-admin-logout" class="btn-secondary">Quitter le mode vendeur</button>
+                </div>
+
+                <form id="form-admin-add" class="admin-form">
+                    <div class="admin-grid">
+                        <!-- Colonne 1 : Photo du vinyle -->
+                        <div class="admin-photo-col">
+                            <label class="admin-label">1. Photo de la pochette *</label>
+                            <div class="admin-photo-drop" id="admin-photo-drop">
+                                <input type="file" id="admin-photo-input" accept="image/*">
+                                <div id="admin-photo-placeholder" class="admin-photo-placeholder">
+                                    <strong>Cliquer ici pour choisir ou prendre une photo</strong>
+                                    <span>Fonctionne depuis l'ordinateur ou le téléphone</span>
+                                </div>
+                                <img id="admin-photo-preview" class="admin-photo-preview" alt="Aperçu pochette" hidden>
+                            </div>
+                            <button type="button" id="btn-remove-admin-photo" class="crate-remove" style="margin-top:6px;" hidden>Changer la photo</button>
+                        </div>
+
+                        <!-- Colonne 2 : Infos simples -->
+                        <div class="admin-fields-col">
+                            <div class="admin-row-2">
+                                <div class="form-field">
+                                    <label for="admin-artist">2. Nom de l'artiste *</label>
+                                    <input type="text" id="admin-artist" required placeholder="Ex : Johnny Hallyday">
+                                </div>
+                                <div class="form-field">
+                                    <label for="admin-title">3. Titre de l'album *</label>
+                                    <input type="text" id="admin-title" required placeholder="Ex : Sang pour sang">
+                                </div>
+                            </div>
+
+                            <div class="admin-row-3">
+                                <div class="form-field">
+                                    <label for="admin-genre">4. Style de musique *</label>
+                                    <select id="admin-genre" required>
+                                        <option value="Rock & Psyché">Rock</option>
+                                        <option value="Jazz & Blues">Jazz & Blues</option>
+                                        <option value="Soul & Funk">Soul & Funk</option>
+                                        <option value="Chanson & Variété FR">Chanson FR</option>
+                                        <option value="Hip-Hop & Electro">Hip-Hop & Electro</option>
+                                        <option value="Reggae & World">Reggae & World</option>
+                                        <option value="Hard & Metal">Hard & Metal</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-field">
+                                    <label for="admin-format">5. Format *</label>
+                                    <select id="admin-format" required>
+                                        <option value="33 Tours">33 Tours</option>
+                                        <option value="45 Tours">45 Tours</option>
+                                        <option value="Double 33T">Double 33T</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-field">
+                                    <label for="admin-price">6. Prix en Euros *</label>
+                                    <input type="number" id="admin-price" required min="1" step="1" placeholder="Ex : 20">
+                                </div>
+                            </div>
+
+                            <div class="admin-row-2">
+                                <div class="form-field">
+                                    <label for="admin-year">Année si connue</label>
+                                    <input type="number" id="admin-year" placeholder="Ex : 1975">
+                                </div>
+                                <div class="form-field">
+                                    <label for="admin-tracks">Morceaux principaux séparés par une virgule</label>
+                                    <input type="text" id="admin-tracks" placeholder="Ex : Titre 1, Titre 2, Titre 3">
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn-primary btn-full" style="margin-top:6px; font-size:15px; padding:14px;">
+                                + Ajouter ce vinyle sur le site
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                <div id="admin-msg" class="form-confirmation-box" hidden></div>
+            </div>
+        </div>
+    </section>
+
     <!-- En-tête simple & direct -->
     <header class="masthead">
         <div class="container">
@@ -242,11 +335,31 @@
         </div>
     </div>
 
-    <!-- Pied de page court -->
+    <!-- Fenêtre Connexion Vendeur (Oncle) -->
+    <div id="login-modal" class="modal-backdrop" hidden>
+        <div class="modal-card" style="max-width: 420px;" role="dialog" aria-modal="true">
+            <button id="btn-close-login" class="modal-close">× FERMER</button>
+            <h2 style="font-family:var(--font-display); font-size:24px; margin-bottom:8px;">Accès Vendeur</h2>
+            <p style="font-size:13.5px; color:var(--ink-muted); margin-bottom:14px;">Entrez votre code secret pour ajouter ou supprimer des vinyles sur le site :</p>
+            <form id="form-login">
+                <div class="form-field">
+                    <label for="login-password">Mot de passe *</label>
+                    <input type="password" id="login-password" required placeholder="Tapez le code vendeur">
+                </div>
+                <p id="login-error" style="color:var(--accent-red); font-family:var(--font-mono); font-size:12px; margin-bottom:10px;" hidden>Code incorrect. Réessayez.</p>
+                <button type="submit" class="btn-primary btn-full">Se connecter</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Pied de page court avec bouton Accès Vendeur -->
     <footer class="site-footer">
         <div class="container footer-simple">
             <span><strong>BARWETA RECORDS</strong> — Vente et rachat de vinyles entre particuliers à Orléans</span>
-            <span>Tél : 06 00 00 00 00 • Email : contact@barweta-records.fr</span>
+            <div class="footer-right">
+                <span>Tél : 06 00 00 00 00 • Email : contact@barweta-records.fr</span>
+                <button type="button" id="btn-open-login" class="btn-admin-access">Accès Vendeur</button>
+            </div>
         </div>
     </footer>
 
