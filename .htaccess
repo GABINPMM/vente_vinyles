@@ -1,0 +1,24 @@
+# ==========================================================================
+# BARWETA RECORDS — Blindage Sécurité Apache OVH (.htaccess racine)
+# ==========================================================================
+
+Options -Indexes
+
+# Bloquer l'accès direct aux fichiers sensibles (.sql, .json, .bat, .log)
+<FilesMatch "\.(sql|json|bat|log|ini|sh)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# En-têtes de sécurité HTTP (Anti-Clickjacking, Anti-MIME Sniffing, XSS)
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "DENY"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>

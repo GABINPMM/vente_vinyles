@@ -975,6 +975,29 @@ body {
     color: #fff;
 }
 
+.admin-pass-change {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px dashed #6b6356;
+}
+
+.admin-pass-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-family: var(--font-mono);
+    font-size: 12px;
+}
+
+.admin-pass-form input[type="password"] {
+    padding: 8px 10px;
+    border: var(--border-heavy);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    background-color: #fff;
+}
+
 /* ==========================================================================
    ADAPTATION TÉLÉPHONE (MOBILE — GRILLE 3 VINYLES PAR LIGNE)
    ========================================================================== */

@@ -1,191 +1,15 @@
 /* ==========================================================================
-   BARWETA RECORDS — Catalogue, Recherche & Espace Vendeur (Oncle)
+   BARWETA RECORDS — Front-End Sécurisé (Anti-XSS, Anti-CSRF, Session Bcrypt)
+   Aucun mot de passe n'est présent dans ce code : tout est chiffré (BCRYPT)
+   et vérifié côté serveur dans api.php.
    ========================================================================== */
 
-const DEFAULT_CATALOG = [
-    {
-        id: "VIN-01",
-        artist: "Pink Floyd",
-        title: "Wish You Were Here",
-        genre: "Rock & Psyché",
-        year: 1975,
-        format: "33 Tours",
-        isNewArrival: true,
-        price: 35.00,
-        jacketColor: "linear-gradient(135deg, #1f2b38 0%, #3a4e63 100%)",
-        labelColor: "#d99b26",
-        tracks: ["Shine On You Crazy Diamond", "Welcome to the Machine", "Have a Cigar", "Wish You Were Here"]
-    },
-    {
-        id: "VIN-02",
-        artist: "Miles Davis",
-        title: "Ascenseur pour l'échafaud",
-        genre: "Jazz & Blues",
-        year: 1958,
-        format: "33 Tours",
-        isNewArrival: true,
-        price: 40.00,
-        jacketColor: "linear-gradient(135deg, #2b2623 0%, #4a413b 100%)",
-        labelColor: "#1e4d3b",
-        tracks: ["Générique", "L'Assassinat de Carala", "Sur l'autoroute", "Julien dans l'ascenseur", "Florence sur les Champs-Élysées", "Dîner au motel"]
-    },
-    {
-        id: "VIN-03",
-        artist: "Serge Gainsbourg",
-        title: "Histoire de Melody Nelson",
-        genre: "Chanson & Variété FR",
-        year: 1971,
-        format: "33 Tours",
-        isNewArrival: false,
-        price: 45.00,
-        jacketColor: "linear-gradient(135deg, #5e1914 0%, #2e0c0a 100%)",
-        labelColor: "#1f3a60",
-        tracks: ["Melody", "Ballade de Melody Nelson", "Valse de Melody", "Ah ! Melody", "L'Hôtel particulier", "En Melody", "Cargo culte"]
-    },
-    {
-        id: "VIN-04",
-        artist: "Marvin Gaye",
-        title: "What's Going On",
-        genre: "Soul & Funk",
-        year: 1971,
-        format: "33 Tours",
-        isNewArrival: true,
-        price: 30.00,
-        jacketColor: "linear-gradient(135deg, #593a22 0%, #8c5d38 100%)",
-        labelColor: "#c93b2b",
-        tracks: ["What's Going On", "What's Happening Brother", "Flyin' High", "Save the Children", "Mercy Mercy Me", "Inner City Blues"]
-    },
-    {
-        id: "VIN-05",
-        artist: "Daft Punk",
-        title: "Homework",
-        genre: "Hip-Hop & Electro",
-        year: 1997,
-        format: "Double 33T",
-        isNewArrival: false,
-        price: 30.00,
-        jacketColor: "linear-gradient(135deg, #111111 0%, #2c2c2c 100%)",
-        labelColor: "#b82525",
-        tracks: ["Daftendirekt", "Revolution 909", "Da Funk", "Around the World", "Rollin' & Scratchin'", "Alive"]
-    },
-    {
-        id: "VIN-06",
-        artist: "Bob Marley & The Wailers",
-        title: "Exodus",
-        genre: "Reggae & World",
-        year: 1977,
-        format: "33 Tours",
-        isNewArrival: true,
-        price: 22.00,
-        jacketColor: "linear-gradient(135deg, #8a6421 0%, #bd8b2d 100%)",
-        labelColor: "#d96b27",
-        tracks: ["Natural Mystic", "So Much Things to Say", "Guiltiness", "The Heathen", "Exodus", "Jamming", "Waiting in Vain", "Three Little Birds"]
-    },
-    {
-        id: "VIN-07",
-        artist: "Black Sabbath",
-        title: "Paranoid",
-        genre: "Hard & Metal",
-        year: 1970,
-        format: "33 Tours",
-        isNewArrival: false,
-        price: 35.00,
-        jacketColor: "linear-gradient(135deg, #2e1530 0%, #61264b 100%)",
-        labelColor: "#e6dfd3",
-        tracks: ["War Pigs", "Paranoid", "Planet Caravan", "Iron Man", "Electric Funeral", "Hand of Doom", "Fairies Wear Boots"]
-    },
-    {
-        id: "VIN-08",
-        artist: "Jacques Brel",
-        title: "Ces Gens-Là",
-        genre: "Chanson & Variété FR",
-        year: 1966,
-        format: "45 Tours",
-        isNewArrival: true,
-        price: 10.00,
-        jacketColor: "linear-gradient(135deg, #3b3228 0%, #5e5041 100%)",
-        labelColor: "#d97a26",
-        tracks: ["Ces gens-là", "Jacky", "L'âge idiot", "Fernand"]
-    },
-    {
-        id: "VIN-09",
-        artist: "Fela Kuti & Africa 70",
-        title: "Zombie",
-        genre: "Reggae & World",
-        year: 1977,
-        format: "33 Tours",
-        isNewArrival: true,
-        price: 25.00,
-        jacketColor: "linear-gradient(135deg, #214d2e 0%, #3b7a4c 100%)",
-        labelColor: "#e8c44d",
-        tracks: ["Zombie", "Mister Follow Follow"]
-    },
-    {
-        id: "VIN-10",
-        artist: "The Doors",
-        title: "L.A. Woman",
-        genre: "Rock & Psyché",
-        year: 1971,
-        format: "33 Tours",
-        isNewArrival: false,
-        price: 28.00,
-        jacketColor: "linear-gradient(135deg, #4f1c1d 0%, #7d2c2e 100%)",
-        labelColor: "#c79a2c",
-        tracks: ["The Changeling", "Love Her Madly", "Been Down So Long", "Cars Hiss by My Window", "L.A. Woman", "Riders on the Storm"]
-    },
-    {
-        id: "VIN-11",
-        artist: "IAM",
-        title: "L'École du Micro d'Argent",
-        genre: "Hip-Hop & Electro",
-        year: 1997,
-        format: "Double 33T",
-        isNewArrival: true,
-        price: 30.00,
-        jacketColor: "linear-gradient(135deg, #2d3033 0%, #52575c 100%)",
-        labelColor: "#a3a8ad",
-        tracks: ["L'École du Micro d'Argent", "Nés sous la même étoile", "La Saga", "Petit frère", "Demain, c'est loin"]
-    },
-    {
-        id: "VIN-12",
-        artist: "Aretha Franklin",
-        title: "Respect / Dr. Feelgood",
-        genre: "Soul & Funk",
-        year: 1967,
-        format: "45 Tours",
-        isNewArrival: false,
-        price: 10.00,
-        jacketColor: "linear-gradient(135deg, #872b1b 0%, #b83d27 100%)",
-        labelColor: "#c93b2b",
-        tracks: ["Face A : Respect", "Face B : Dr. Feelgood"]
-    }
-];
-
-// Mot de passe Vendeur pour l'oncle (modifiable ici très facilement)
-const VENDOR_PASSWORD = "barweta";
-
-// Chargement du catalogue (avec les ajouts/suppressions de l'oncle sauvegardés)
 let vinylCatalog = [];
-try {
-    const saved = localStorage.getItem("barweta_records_catalog_v1");
-    vinylCatalog = saved ? JSON.parse(saved) : [...DEFAULT_CATALOG];
-} catch (e) {
-    vinylCatalog = [...DEFAULT_CATALOG];
-}
-
-function saveCatalog() {
-    try {
-        localStorage.setItem("barweta_records_catalog_v1", JSON.stringify(vinylCatalog));
-    } catch (e) {
-        alert("Attention : la mémoire locale est pleine, pensez à utiliser une image plus légère.");
-    }
-}
-
-// État général
 let activeGenre = "all";
 let searchQuery = "";
 let sortBy = "recent";
-let isVendorLoggedIn = sessionStorage.getItem("barweta_vendor_logged") === "true";
+let isVendorLoggedIn = false;
+let csrfToken = "";
 let crateIds = JSON.parse(localStorage.getItem("barweta_records_selection") || "[]");
 let buyPhotosFiles = [];
 let sellPhotosFiles = [];
@@ -228,13 +52,63 @@ const adminPhotoPreview = document.getElementById("admin-photo-preview");
 const adminPhotoPlaceholder = document.getElementById("admin-photo-placeholder");
 const btnRemoveAdminPhoto = document.getElementById("btn-remove-admin-photo");
 const adminMsg = document.getElementById("admin-msg");
+const formChangePassword = document.getElementById("form-change-password");
+const newVendorPasswordInput = document.getElementById("new-vendor-password");
 
 function formatEUR(val) {
     return Number(val).toFixed(0) + " €";
 }
 
+// Échappement strict Anti-XSS pour toute donnée affichée dans le HTML
+function escapeHTML(str) {
+    return String(str ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+// Requête POST sécurisée avec Jeton Anti-CSRF
+async function securePost(action, payload = {}) {
+    return fetch(`api.php?action=${encodeURIComponent(action)}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-Token": csrfToken
+        },
+        credentials: "same-origin",
+        body: JSON.stringify(payload)
+    });
+}
+
 // ==========================================================================
-// ESPACE VENDEUR (CONNEXION, COMPRESSION PHOTO, AJOUT & SUPPRESSION)
+// CHARGEMENT DU CATALOGUE DEPUIS LA BASE DE DONNÉES (api.php)
+// ==========================================================================
+async function fetchCatalogFromServer() {
+    try {
+        const res = await fetch("api.php?action=list", { credentials: "same-origin" });
+        if (!res.ok) throw new Error("Serveur PHP non démarré");
+        const data = await res.json();
+        if (data.ok) {
+            vinylCatalog = data.vinyls || [];
+            isVendorLoggedIn = Boolean(data.isLoggedIn);
+            csrfToken = data.csrfToken || "";
+            updateVendorUI();
+            updateCrateUI();
+        }
+    } catch (err) {
+        recordsContainer.innerHTML = `
+            <div style="grid-column: 1 / -1; background:#fff; border:2px solid #1c1a17; padding:18px; font-family:var(--font-mono); font-size:13px;">
+                <strong>Serveur PHP requis :</strong><br>
+                Double-cliquez sur le fichier <code>LANCER_SITE_LOCAL.bat</code> dans le dossier du site pour ouvrir <code>http://localhost:8080</code> avec la sécurité Bcrypt et la base de données actives.
+            </div>
+        `;
+    }
+}
+
+// ==========================================================================
+// ESPACE VENDEUR SÉCURISÉ (AUTHENTIFICATION SERVEUR BCRYPT + ANTI-BRUTEFORCE)
 // ==========================================================================
 function updateVendorUI() {
     adminPanel.hidden = !isVendorLoggedIn;
@@ -258,34 +132,66 @@ loginModal.addEventListener("click", e => {
     if (e.target === loginModal) loginModal.hidden = true;
 });
 
-formLogin.addEventListener("submit", e => {
+// Vérification du mot de passe côté serveur via Bcrypt + Jeton CSRF
+formLogin.addEventListener("submit", async e => {
     e.preventDefault();
-    const typed = loginPasswordInput.value.trim().toLowerCase();
-    if (typed === VENDOR_PASSWORD) {
-        isVendorLoggedIn = true;
-        sessionStorage.setItem("barweta_vendor_logged", "true");
-        loginModal.hidden = true;
-        updateVendorUI();
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
+    loginError.hidden = true;
+    const password = loginPasswordInput.value.trim();
+
+    try {
+        const res = await securePost("login", { password });
+        const data = await res.json();
+        if (res.ok && data.ok) {
+            isVendorLoggedIn = true;
+            if (data.csrfToken) csrfToken = data.csrfToken;
+            loginModal.hidden = true;
+            updateVendorUI();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        } else {
+            loginError.textContent = data.error || "Code incorrect. Réessayez.";
+            loginError.hidden = false;
+        }
+    } catch (err) {
+        loginError.textContent = "Impossible de joindre le serveur PHP.";
         loginError.hidden = false;
     }
 });
 
-btnAdminLogout.addEventListener("click", () => {
+btnAdminLogout.addEventListener("click", async () => {
+    try {
+        const res = await securePost("logout");
+        const data = await res.json();
+        if (data.csrfToken) csrfToken = data.csrfToken;
+    } catch (e) {}
     isVendorLoggedIn = false;
-    sessionStorage.removeItem("barweta_vendor_logged");
     updateVendorUI();
 });
 
-// Compression automatique de la photo prise par l'oncle (pour que ce soit léger et rapide)
+// Changement de code vendeur (haché avec Bcrypt coût 12 côté serveur)
+if (formChangePassword) {
+    formChangePassword.addEventListener("submit", async e => {
+        e.preventDefault();
+        const newPassword = newVendorPasswordInput.value.trim();
+        const res = await securePost("change_password", { newPassword });
+        const data = await res.json();
+        if (res.ok && data.ok) {
+            newVendorPasswordInput.value = "";
+            adminMsg.textContent = "Votre nouveau code vendeur a été chiffré et enregistré dans la base de données !";
+            adminMsg.hidden = false;
+        } else {
+            alert(data.error || "Erreur lors du changement de code.");
+        }
+    });
+}
+
+// Compression automatique de la photo avant envoi au serveur
 function compressImageFile(file, callback) {
     const reader = new FileReader();
     reader.onload = function(event) {
         const img = new Image();
         img.onload = function() {
             const canvas = document.createElement("canvas");
-            const MAX_SIZE = 500;
+            const MAX_SIZE = 600;
             let width = img.width;
             let height = img.height;
 
@@ -305,7 +211,7 @@ function compressImageFile(file, callback) {
             canvas.height = height;
             const ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0, width, height);
-            const dataUrl = canvas.toDataURL("image/jpeg", 0.82);
+            const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
             callback(dataUrl);
         };
         img.src = event.target.result;
@@ -334,8 +240,8 @@ btnRemoveAdminPhoto.addEventListener("click", () => {
     btnRemoveAdminPhoto.hidden = true;
 });
 
-// Ajout d'un nouveau vinyle par l'oncle
-formAdminAdd.addEventListener("submit", e => {
+// Ajout d'un vinyle dans la base de données serveur
+formAdminAdd.addEventListener("submit", async e => {
     e.preventDefault();
     const artist = document.getElementById("admin-artist").value.trim();
     const title = document.getElementById("admin-title").value.trim();
@@ -354,50 +260,52 @@ formAdminAdd.addEventListener("submit", e => {
         ? tracksInput.split(",").map(t => t.trim()).filter(Boolean)
         : ["Morceaux à découvrir sur le disque"];
 
-    const newRecord = {
-        id: "VIN-" + Date.now(),
+    const res = await securePost("add", {
         artist,
         title,
         genre,
-        year: yearInput ? Number(yearInput) : "Époque",
         format,
-        isNewArrival: true,
         price,
-        photoUrl: adminUploadedPhotoDataUrl,
-        jacketColor: "linear-gradient(135deg, #2b2623 0%, #4a413b 100%)",
-        labelColor: "#c93b2b",
-        tracks: tracksList
-    };
+        year: yearInput || "Époque",
+        tracks: tracksList,
+        photoData: adminUploadedPhotoDataUrl
+    });
 
-    // Place le nouveau vinyle tout en haut du catalogue
-    vinylCatalog.unshift(newRecord);
-    saveCatalog();
+    const data = await res.json();
+    if (res.ok && data.ok) {
+        vinylCatalog.unshift(data.vinyl);
+        formAdminAdd.reset();
+        btnRemoveAdminPhoto.click();
 
-    // Réinitialiser le formulaire
-    formAdminAdd.reset();
-    btnRemoveAdminPhoto.click();
+        adminMsg.textContent = `Le vinyle « ${artist} — ${title} » a bien été enregistré dans la base de données !`;
+        adminMsg.hidden = false;
 
-    adminMsg.innerHTML = `<strong>Le vinyle « ${artist} — ${title} » a bien été ajouté sur le site !</strong> Il apparaît maintenant en premier dans le catalogue ci-dessous.`;
-    adminMsg.hidden = false;
-
-    activeGenre = "all";
-    genreTabs.forEach(t => t.classList.toggle("active", t.dataset.genre === "all"));
-    renderCatalog();
+        activeGenre = "all";
+        genreTabs.forEach(t => t.classList.toggle("active", t.dataset.genre === "all"));
+        renderCatalog();
+    } else {
+        alert(data.error || "Erreur lors de l'enregistrement du vinyle.");
+    }
 });
 
-// Suppression d'un vinyle vendu par l'oncle
-window.deleteRecordFromCatalog = function(recordId) {
+// Suppression d'un vinyle de la base de données serveur
+window.deleteRecordFromCatalog = async function(recordId) {
     const rec = vinylCatalog.find(r => r.id === recordId);
     if (!rec) return;
-    const ok = confirm(`Voulez-vous retirer le vinyle « ${rec.artist} - ${rec.title} » du site ?`);
+    const ok = confirm(`Voulez-vous supprimer définitivement le vinyle « ${rec.artist} - ${rec.title} » de la base de données ?`);
     if (!ok) return;
 
-    vinylCatalog = vinylCatalog.filter(r => r.id !== recordId);
-    crateIds = crateIds.filter(id => id !== recordId);
-    saveCatalog();
-    localStorage.setItem("barweta_records_selection", JSON.stringify(crateIds));
-    updateCrateUI();
-    renderCatalog();
+    const res = await securePost("delete", { id: recordId });
+    const data = await res.json();
+    if (res.ok && data.ok) {
+        vinylCatalog = vinylCatalog.filter(r => r.id !== recordId);
+        crateIds = crateIds.filter(id => id !== recordId);
+        localStorage.setItem("barweta_records_selection", JSON.stringify(crateIds));
+        updateCrateUI();
+        renderCatalog();
+    } else {
+        alert(data.error || "Erreur lors de la suppression.");
+    }
 };
 
 // ==========================================================================
@@ -436,7 +344,7 @@ window.openActionTab = function(mode, prefillQuery = "") {
 };
 
 // ==========================================================================
-// RECHERCHE, TRI & AFFICHAGE DU CATALOGUE
+// RECHERCHE, TRI & AFFICHAGE DU CATALOGUE (AVEC PROTECTION ANTI-XSS)
 // ==========================================================================
 function getFilteredRecords() {
     const q = searchQuery.trim().toLowerCase();
@@ -454,7 +362,7 @@ function getFilteredRecords() {
         if (sortBy === "price-asc") return a.price - b.price;
         if (sortBy === "price-desc") return b.price - a.price;
         if (sortBy === "artist-asc") return a.artist.localeCompare(b.artist, "fr");
-        return 0; // Par défaut : garde l'ordre d'ajout (les derniers ajoutés en premier)
+        return 0;
     });
 
     return list;
@@ -472,28 +380,34 @@ function renderCatalog() {
     emptyState.hidden = true;
 
     recordsContainer.innerHTML = records.map(rec => {
+        const safeId = escapeHTML(rec.id);
+        const safeArtist = escapeHTML(rec.artist);
+        const safeTitle = escapeHTML(rec.title);
+        const safeGenre = escapeHTML(rec.genre);
+        const safeFormat = escapeHTML(rec.format);
+        const safeYear = escapeHTML(rec.year);
+        const safePhotoUrl = escapeHTML(rec.photoUrl || "");
         const inCrate = crateIds.includes(rec.id);
 
-        // Si l'oncle a mis une vraie photo, on affiche sa photo sur la pochette !
-        const jacketHTML = rec.photoUrl
-            ? `<img src="${rec.photoUrl}" alt="${rec.artist} - ${rec.title}" class="album-jacket-photo">`
-            : `<div class="album-jacket" style="background: ${rec.jacketColor};">
-                    <div class="jacket-top-meta">${rec.year}</div>
+        const jacketHTML = safePhotoUrl
+            ? `<img src="${safePhotoUrl}" alt="${safeArtist} - ${safeTitle}" class="album-jacket-photo">`
+            : `<div class="album-jacket" style="background: ${escapeHTML(rec.jacketColor || "linear-gradient(135deg, #2b2623 0%, #4a413b 100%)")};">
+                    <div class="jacket-top-meta">${safeYear}</div>
                     <div>
-                        <div class="jacket-artist">${rec.artist}</div>
-                        <div class="jacket-title">${rec.title}</div>
+                        <div class="jacket-artist">${safeArtist}</div>
+                        <div class="jacket-title">${safeTitle}</div>
                     </div>
-                    <div class="jacket-cat">${rec.format}</div>
+                    <div class="jacket-cat">${safeFormat}</div>
                </div>`;
 
         return `
             <article class="record-card">
                 <div class="price-sticker">${formatEUR(rec.price)}</div>
 
-                <div class="sleeve-visual" onclick="openRecordModal('${rec.id}')" title="Voir les morceaux">
+                <div class="sleeve-visual" onclick="openRecordModal('${safeId}')" title="Voir les morceaux">
                     ${jacketHTML}
                     <div class="vinyl-disc">
-                        <div class="vinyl-center-label" style="background-color: ${rec.labelColor || "#c93b2b"};">
+                        <div class="vinyl-center-label" style="background-color: ${escapeHTML(rec.labelColor || "#c93b2b")};">
                             <div class="vinyl-hole"></div>
                         </div>
                     </div>
@@ -501,21 +415,21 @@ function renderCatalog() {
 
                 <div class="record-body">
                     <div class="record-meta-top">
-                        <span>${rec.genre}</span>
-                        <span>${rec.format} • ${rec.year}</span>
+                        <span>${safeGenre}</span>
+                        <span>${safeFormat} • ${safeYear}</span>
                     </div>
-                    <h3 class="record-artist">${rec.artist}</h3>
-                    <p class="record-title">${rec.title}</p>
+                    <h3 class="record-artist">${safeArtist}</h3>
+                    <p class="record-title">${safeTitle}</p>
 
                     <div class="record-actions">
-                        <button class="btn-details" onclick="openRecordModal('${rec.id}')">Titres</button>
-                        <button class="btn-reserve ${inCrate ? "in-crate" : ""}" onclick="toggleCrate('${rec.id}')">
+                        <button class="btn-details" onclick="openRecordModal('${safeId}')">Titres</button>
+                        <button class="btn-reserve ${inCrate ? "in-crate" : ""}" onclick="toggleCrate('${safeId}')">
                             ${inCrate ? "Sélectionné" : "+ Choisir"}
                         </button>
                     </div>
                     ${isVendorLoggedIn ? `
-                        <button type="button" class="btn-delete-record" onclick="deleteRecordFromCatalog('${rec.id}')">
-                            Supprimer ce vinyle du site
+                        <button type="button" class="btn-delete-record" onclick="deleteRecordFromCatalog('${safeId}')">
+                            Supprimer ce vinyle
                         </button>
                     ` : ""}
                 </div>
@@ -524,35 +438,40 @@ function renderCatalog() {
     }).join("");
 }
 
-// Fenêtre simple pour voir les titres d'un disque
 window.openRecordModal = function(recordId) {
     const rec = vinylCatalog.find(r => r.id === recordId);
     if (!rec) return;
     const inCrate = crateIds.includes(rec.id);
 
+    const safeId = escapeHTML(rec.id);
+    const safeArtist = escapeHTML(rec.artist);
+    const safeTitle = escapeHTML(rec.title);
+    const safeFormat = escapeHTML(rec.format);
+    const safeYear = escapeHTML(rec.year);
+    const safePhotoUrl = escapeHTML(rec.photoUrl || "");
+
     modalBody.innerHTML = `
-        ${rec.photoUrl ? `<img src="${rec.photoUrl}" alt="${rec.title}" style="width:160px; height:160px; object-fit:cover; border:2px solid #1c1a17; margin-bottom:10px;">` : ""}
-        <h2 style="font-family:var(--font-display); font-size:24px;">${rec.artist}</h2>
+        ${safePhotoUrl ? `<img src="${safePhotoUrl}" alt="${safeTitle}" style="width:160px; height:160px; object-fit:cover; border:2px solid #1c1a17; margin-bottom:10px;">` : ""}
+        <h2 style="font-family:var(--font-display); font-size:24px;">${safeArtist}</h2>
         <p style="font-style:italic; font-size:17px; color:var(--ink-muted); margin-bottom:10px;">
-            ${rec.title} • ${rec.format} • ${rec.year} — <strong style="color:var(--accent-red);">${formatEUR(rec.price)}</strong>
+            ${safeTitle} • ${safeFormat} • ${safeYear} — <strong style="color:var(--accent-red);">${formatEUR(rec.price)}</strong>
         </p>
         <p style="font-size:13px; margin-bottom:10px;">Bon état • Remise sur Orléans</p>
 
         <div class="modal-tracklist">
             <strong>Morceaux :</strong>
             <ol>
-                ${rec.tracks.map(t => `<li>${t}</li>`).join("")}
+                ${(rec.tracks || []).map(t => `<li>${escapeHTML(t)}</li>`).join("")}
             </ol>
         </div>
 
-        <button class="btn-primary btn-full" onclick="toggleCrate('${rec.id}'); recordModal.hidden = true;">
+        <button class="btn-primary btn-full" onclick="toggleCrate('${safeId}'); recordModal.hidden = true;">
             ${inCrate ? "Retirer de ma sélection" : "+ Ajouter à ma sélection"}
         </button>
     `;
     recordModal.hidden = false;
 };
 
-// Ajouter / Retirer un disque de sa sélection
 window.toggleCrate = function(recordId) {
     if (crateIds.includes(recordId)) {
         crateIds = crateIds.filter(id => id !== recordId);
@@ -577,11 +496,12 @@ function updateCrateUI() {
     const rows = crateIds.map(id => {
         const rec = vinylCatalog.find(r => r.id === id);
         if (!rec) return "";
-        subtotal += rec.price;
+        subtotal += Number(rec.price);
+        const safeId = escapeHTML(rec.id);
         return `
             <div class="crate-item">
-                <span><strong>${rec.artist}</strong> — ${rec.title} • ${formatEUR(rec.price)}</span>
-                <button type="button" class="crate-remove" onclick="toggleCrate('${rec.id}')">Retirer</button>
+                <span><strong>${escapeHTML(rec.artist)}</strong> — ${escapeHTML(rec.title)} • ${formatEUR(rec.price)}</span>
+                <button type="button" class="crate-remove" onclick="toggleCrate('${safeId}')">Retirer</button>
             </div>
         `;
     }).join("");
@@ -595,7 +515,6 @@ function updateCrateUI() {
     `;
 }
 
-// Gestion de l'aperçu des photos des formulaires visiteurs
 function setupPhotoUpload(inputId, previewId, filesArrayRef) {
     const input = document.getElementById(inputId);
     const preview = document.getElementById(previewId);
@@ -605,7 +524,7 @@ function setupPhotoUpload(inputId, previewId, filesArrayRef) {
             const url = URL.createObjectURL(file);
             return `
                 <div class="photo-thumb">
-                    <img src="${url}" alt="${file.name}">
+                    <img src="${url}" alt="${escapeHTML(file.name)}">
                     <button type="button" data-idx="${idx}">×</button>
                 </div>
             `;
@@ -629,11 +548,10 @@ function setupPhotoUpload(inputId, previewId, filesArrayRef) {
 setupPhotoUpload("buy-photos", "buy-photos-preview", buyPhotosFiles);
 setupPhotoUpload("sell-photos", "sell-photos-preview", sellPhotosFiles);
 
-// Envoi des formulaires visiteurs
 formBuy.addEventListener("submit", e => {
     e.preventDefault();
-    const name = document.getElementById("buy-name").value.trim();
-    const contact = document.getElementById("buy-contact").value.trim();
+    const name = escapeHTML(document.getElementById("buy-name").value.trim());
+    const contact = escapeHTML(document.getElementById("buy-contact").value.trim());
     const customReq = buyCustomRequest.value.trim();
 
     if (crateIds.length === 0 && !customReq) {
@@ -650,8 +568,8 @@ formBuy.addEventListener("submit", e => {
 
 formSell.addEventListener("submit", e => {
     e.preventDefault();
-    const name = document.getElementById("sell-name").value.trim();
-    const contact = document.getElementById("sell-contact").value.trim();
+    const name = escapeHTML(document.getElementById("sell-name").value.trim());
+    const contact = escapeHTML(document.getElementById("sell-contact").value.trim());
 
     formConfirmationBox.innerHTML = `
         <strong>Proposition envoyée !</strong> Merci ${name}, je vous recontacte très vite au <strong>${contact}</strong>.
@@ -659,7 +577,6 @@ formSell.addEventListener("submit", e => {
     formConfirmationBox.hidden = false;
 });
 
-// Événements de recherche et tri
 searchInput.addEventListener("input", e => {
     searchQuery = e.target.value;
     btnClearSearch.hidden = searchQuery.length === 0;
@@ -705,6 +622,5 @@ recordModal.addEventListener("click", e => {
     if (e.target === recordModal) recordModal.hidden = true;
 });
 
-// Initialisation
-updateCrateUI();
-updateVendorUI();
+// Initialisation au chargement de la page
+fetchCatalogFromServer();

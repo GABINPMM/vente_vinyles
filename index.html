@@ -100,6 +100,15 @@
                     </div>
                 </form>
                 <div id="admin-msg" class="form-confirmation-box" hidden></div>
+
+                <!-- Changement sécurisé du code vendeur (chiffrement Bcrypt en base) -->
+                <div class="admin-pass-change">
+                    <form id="form-change-password" class="admin-pass-form">
+                        <label for="new-vendor-password">Changer mon code vendeur :</label>
+                        <input type="password" id="new-vendor-password" required minlength="4" placeholder="Nouveau code secret">
+                        <button type="submit" class="btn-secondary">Enregistrer le nouveau code</button>
+                    </form>
+                </div>
             </div>
         </div>
     </section>
